@@ -2,13 +2,7 @@
 #define HYGROMETERCONSOLE_H
 
 #include <Arduino.h>    //This likely defines wire.h
-#include <Preferences.h>
-#include "lan.h"
-#include "i2c.h"
 #include "app.h"
-#include "nvm.h"
-#include "epdif.h"
-#include "bq2742.h"
 
 
 
@@ -32,7 +26,7 @@ class CONSOLE {
          * @param \p none 
          * @return nothing
          */
-        void console (APP & app_functions);
+        void user_console (APP & app_functions);
 
         /**
          * @brief Get number input from user (0-255)

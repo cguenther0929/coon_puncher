@@ -18,4 +18,4 @@ It is necessary to install the ESP Mail Client library in order for proper compi
 Go to `Sketch > Include Library > Manage Libraries` and search for **ESP Mail Client** (not ESP**32**). Install the ESP Mail Client library which was written by **Mobizt**.  The reader shall take caution not to confuse **ESP** Mail Client with ESP**32** Mail Client.  
 
 ### VERSIONS ###
-* V0.0.1 -- TBD
+* v1.0.0 -- This version needs to be tested, but this is a release candidate.  

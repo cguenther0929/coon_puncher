@@ -31,22 +31,12 @@
 #define SENSOR_H
 
 #include <Arduino.h>    //This likely defines wire.h
-#include <esp_sleep.h>    //This likely defines wire.h
-#include <Preferences.h>
 #include <esp_timer.h>
-#include <WiFi.h>
-#include "nvm.h"
-#include "i2c.h"
-#include "epdif.h"
-#include "driver/rtc_io.h"
-#include "epd1in54_V2.h"
-#include "epdpaint.h"
-#include "imagedata.h"
-#include "lan.h"
+#include "app.h"
 
 // ==============================
 // ==============================
-#define     SW_VER_STRING       "1.0.3" 
+#define     SW_VER_STRING       "0.0.1" 
 // ==============================
 // ==============================
 
@@ -69,11 +59,6 @@
 #define ENABLE_LOGGING          false
 
 /**
- * Health LED
- */
-#define HEALTH_LED              10
-
-/**
  * GPIO Power Enable Pin
  */
 #define nGPIO_EN_PWR            0
@@ -88,12 +73,7 @@
  */
 #define DEFAULT_BAT_CAP         1700  // 2×850 mAh
 
-/**
- * Button related
- */
-#define BUTTON_INPUT        1
-#define SHORT_PRESS_50MS_TICKS   20      // 20 of these in a second
-#define LONG_PRESS_50MS_TICKS    60      // 20 of these in a second
+
 
 /**
  * Interrupt / button pin
@@ -115,13 +95,6 @@
 /* Define IO */
 #define nSENSOR_PWR_EN              3
 #define SENSOR_MUX_RST_LINE         9
-
-typedef enum State {
-  STATE_SLEEP,
-  STATE_READ_DATA,
-  STATE_UPDATE_DISPLAY,
-  STATE_SEND_EMAIL
-};
 
 /**
  * ESP 32 Analog related parameters
@@ -145,18 +118,24 @@ typedef enum State {
 class SENSOR
 {
     public:
-        
         bool sensor_is_calibrated               = false;
         bool measure_distance_flag              = false;
-        float current_distance                  0.0;
-        float threshold_distance                0.0;
+        float current_distance                  = 0.0;
+        float threshold_distance                = 10.0;
         
+        /**
+         * @brief Sensor initialization routine
+         * @param \p none 
+         * @return nothing 
+         */
+        void init( void );
+
         /**
          * @brief Update class parameter float current_distance    
          * @param \p none 
          * @return nothing 
          */
-        void SENSOR::get_distance( void )
+        void get_distance( void );
 
         
 };
