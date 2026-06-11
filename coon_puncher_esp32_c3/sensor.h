@@ -121,7 +121,7 @@ class SENSOR
         bool sensor_is_calibrated               = false;
         bool measure_distance_flag              = false;
         float current_distance                  = 0.0;
-        float threshold_distance                = 10.0;
+        float threshold_distance                = 99.99;
         
         /**
          * @brief Sensor initialization routine

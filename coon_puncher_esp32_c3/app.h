@@ -35,7 +35,7 @@
 
 // ==============================
 // ==============================
-#define     SW_VER_STRING       "1.0.0" 
+#define     SW_VER_STRING       "1.1.0" 
 // ==============================
 // ==============================
 
@@ -44,7 +44,7 @@
  * Set to true to 
  * enable logging
  */
-#define ENABLE_LOGGING          true
+#define ENABLE_LOGGING          false
 
 /**
  * Health LED

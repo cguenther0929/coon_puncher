@@ -250,6 +250,8 @@ void loop()
       }
 
       ino_app_functions.button_handler();
+      ino_app_functions.state_handler(ino_app_functions, ino_sensor_functions);
+
       
     }
     
@@ -259,6 +261,7 @@ void loop()
     if(Timer100msFlag == true) 
     {
       Timer100msFlag = false;
+      ino_sensor_functions.measure_distance_flag = true;
     }
     
     /**
@@ -272,7 +275,7 @@ void loop()
         digitalWrite(HEALTH_LED, !digitalRead(HEALTH_LED));
       }
 
-      ino_app_functions.state_handler(ino_app_functions, ino_sensor_functions);
+      
     }
     /**
      * EVERY SECOND
@@ -287,7 +290,7 @@ void loop()
       }
 
       
-      ino_sensor_functions.measure_distance_flag = true;
+      
       ino_app_functions.seconds_counter++;
       
       if(ino_app_functions.btn_interrupt_triggered && digitalRead(BUTTON_INPUT) &&

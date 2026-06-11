@@ -14,8 +14,6 @@ void SENSOR::get_distance( void )
 {
   
   // Send 10 us trigger pulse
-  // digitalWrite(TRIG_PIN, LOW);  //TODO I think we can remove these two lines
-  // delayMicroseconds(2);
 
   digitalWrite(TRIG_PIN, HIGH);
   delayMicroseconds(10);

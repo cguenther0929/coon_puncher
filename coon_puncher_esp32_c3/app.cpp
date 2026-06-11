@@ -104,16 +104,22 @@ void APP::state_handler( APP & app_functions, SENSOR & app_sensor_functions )
     case STATE_CALIBRATE:
       if(ENABLE_LOGGING)
       {
-        Serial.println("^In state **CALIBRATE**");
+        Serial.println("^           **********In state **CALIBRATE**");
         delay(10);
       }      
-
+      
       app_sensor_functions.get_distance();
       app_sensor_functions.threshold_distance = app_sensor_functions.current_distance * 0.9;
       app_sensor_functions.sensor_is_calibrated  = true;
       app_functions.enable_led = false;
       digitalWrite(HEALTH_LED, HIGH);       //Turn LED OFF
-
+      
+      if(ENABLE_LOGGING)
+      {
+        Serial.print("^           **********Threshold set to: ");
+        Serial.println(app_sensor_functions.threshold_distance);
+        delay(10);
+      }      
       this -> state = STATE_SLEEP;
 
     break;
