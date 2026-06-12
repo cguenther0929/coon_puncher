@@ -8,31 +8,31 @@ SENSOR  app_sensor_functions;
 
 void APP::init(void) 
 {
-  this -> state = STATE_WAIT_FOR_CAL; 
+  this -> state = STATE_WAIT_FOR_BUTTON; 
 }
 
 /**
  * These are the states
- *   STATE_WAIT_FOR_CAL,
+ *   STATE_WAIT_FOR_BUTTON,
  *   STATE_SLEEP,
  *   STATE_READ_DISTANCE,
  *   STATE_EVALUATE_DISTANCE,
- *   STATE_CALIBRATE,
+ *   STATE_OK_TO_START,
  *   STATE_RESET_TRAP
  */
 void APP::state_handler( APP & app_functions, SENSOR & app_sensor_functions ) 
 {
+
   switch(app_functions.state) 
   {
     
-    case STATE_WAIT_FOR_CAL:
+    case STATE_WAIT_FOR_BUTTON:
     
       if(ENABLE_LOGGING)
       {
-        Serial.println("^**WAITING FOR CALIBRATION**");
-        delay(10);
+        Serial.println("^**WAITING FOR START BUTTON**");
       }
-      if(app_sensor_functions.sensor_is_calibrated)
+      if(app_sensor_functions.sensor_ok_to_start)
       {
         this -> state = STATE_READ_DISTANCE;
         app_functions.enable_led = false;
@@ -43,7 +43,6 @@ void APP::state_handler( APP & app_functions, SENSOR & app_sensor_functions )
       if(ENABLE_LOGGING)
       {
         Serial.println("^In state **SLEEP**");
-        delay(10);
       }
 
       if(app_sensor_functions.measure_distance_flag &&
@@ -58,7 +57,6 @@ void APP::state_handler( APP & app_functions, SENSOR & app_sensor_functions )
       if(ENABLE_LOGGING)
       {
         Serial.println("^In state **READ DISTANCE**");
-        delay(10);
       }
       app_sensor_functions.get_distance();
       this -> state = STATE_EVALUATE_DISTANCE;
@@ -69,15 +67,15 @@ void APP::state_handler( APP & app_functions, SENSOR & app_sensor_functions )
       if(ENABLE_LOGGING)
       {
         Serial.println("^In state **EVALUATE DISTANCE**");
-        delay(10);
       }
-      if((app_sensor_functions.current_distance < app_sensor_functions.threshold_distance) && 
-          app_sensor_functions.sensor_is_calibrated)
+      
+      app_sensor_functions.threshold_distance = app_sensor_functions.previous_distance * THRESHOLD_MULTIPLIER;
+      
+      if(app_sensor_functions.current_distance < app_sensor_functions.threshold_distance)
         {
           if(ENABLE_LOGGING)
           {
             Serial.println("^Trap is actuating!");
-            delay(10);
           }
           app_functions.solenoid_retract();
           app_functions.ms50_timer_enabled = true;
@@ -99,18 +97,16 @@ void APP::state_handler( APP & app_functions, SENSOR & app_sensor_functions )
         this -> state = STATE_SLEEP;
       }
 
+      app_sensor_functions.previous_distance = app_sensor_functions.current_distance;
+
     break;
 
-    case STATE_CALIBRATE:
+    case STATE_OK_TO_START:
       if(ENABLE_LOGGING)
       {
-        Serial.println("^           **********In state **CALIBRATE**");
-        delay(10);
+        Serial.println("^ **In state **START**");
       }      
-      
-      app_sensor_functions.get_distance();
-      app_sensor_functions.threshold_distance = app_sensor_functions.current_distance * 0.9;
-      app_sensor_functions.sensor_is_calibrated  = true;
+      app_sensor_functions.sensor_ok_to_start  = true;
       app_functions.enable_led = false;
       digitalWrite(HEALTH_LED, HIGH);       //Turn LED OFF
       
@@ -118,9 +114,8 @@ void APP::state_handler( APP & app_functions, SENSOR & app_sensor_functions )
       {
         Serial.print("^           **********Threshold set to: ");
         Serial.println(app_sensor_functions.threshold_distance);
-        delay(10);
       }      
-      this -> state = STATE_SLEEP;
+      this -> state = STATE_RESET_TRAP;
 
     break;
     
@@ -128,7 +123,6 @@ void APP::state_handler( APP & app_functions, SENSOR & app_sensor_functions )
       if(ENABLE_LOGGING)
       {
         Serial.println("^In state **RESET TRAP**");
-        delay(10);
       }      
       
       if(!app_functions.ms50_timer_enabled)
@@ -228,7 +222,7 @@ void APP::button_handler ( void )
   if(btn_long_press_flag && !btn_short_press_flag) 
   {
     btn_long_press_flag = false;
-    this -> state = STATE_CALIBRATE;
+    this -> state = STATE_OK_TO_START;
     if(ENABLE_LOGGING)
     {
       Serial.println("^Button long press has been handled.");

@@ -21,3 +21,5 @@ Go to `Sketch > Include Library > Manage Libraries` and search for **ESP Mail Cl
 * v1.0.0 -- This version needs to be tested, but this is a release candidate.  
 
 * v1.1.0 -- Measuring distance every 100ms opposed to every second (10× more frequently). Logging has been disabled to improve algorithm efficiency.  
+
+* v1.2.0 -- The algorithm was modified such that calibration happens continuously.  If a new reading is shorter by 5% as compared to the previous reading, the trap will be triggered.  The first state is now to reset the trap instead of measuring distance. 

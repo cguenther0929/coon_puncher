@@ -13,6 +13,10 @@ void SENSOR::init(void)
 void SENSOR::get_distance( void ) 
 {
   
+  // unsigned long avg_array[3];
+  unsigned long duration_us = 0;
+  unsigned long sum = 0;
+  uint8_t i = 0;
   // Send 10 us trigger pulse
 
   digitalWrite(TRIG_PIN, HIGH);
@@ -21,9 +25,16 @@ void SENSOR::get_distance( void )
 
   // Measure echo pulse width, timeout 30 ms
   // 30 ms ~= 5 meters max distance
-  unsigned long duration_us = pulseIn(ECHO_PIN, HIGH, 30000UL);
+  for(i=0; i<3; i++)
+  {
+     sum += pulseIn(ECHO_PIN, HIGH, 30000UL);
+  }
 
-  if (duration_us == 0) {
+  duration_us = sum/3;
+
+
+
+  if (sum == 0) {
     this -> current_distance = -1;   // timeout / no echo
   }
 

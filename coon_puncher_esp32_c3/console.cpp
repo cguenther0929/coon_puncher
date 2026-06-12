@@ -234,11 +234,13 @@ void CONSOLE::user_console ( APP & console_app_functions )
             /* Retract cylinder 
             /************************************/
             case 5:
-                clear_screen();
-                insert_line_feeds(2);
-                insert_line_emphasis();
-                
+            clear_screen();
+            insert_line_feeds(2);
+            insert_line_emphasis();
+            
+            console_app_functions.solenoid_stop();
                 Serial.println("Retracting the cylinder. ");
+                delay(200);
                 console_app_functions.solenoid_retract();
                 delay(1000);
                 console_app_functions.solenoid_stop();
@@ -257,6 +259,8 @@ void CONSOLE::user_console ( APP & console_app_functions )
             insert_line_emphasis();
             
             Serial.println("Extending the cylinder. ");
+            console_app_functions.solenoid_stop();
+            delay(200);
             console_app_functions.solenoid_extend();
             delay(1000);
             console_app_functions.solenoid_stop();

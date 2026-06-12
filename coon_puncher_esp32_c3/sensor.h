@@ -52,11 +52,6 @@
 # define SLEEP_TIME_SEC               SLEEP_TIME_MIN * 60.0 
 # define SLEEP_TIME_MICROS            SLEEP_TIME_SEC * 1000000.0  // ESP32 sleep function allows for a 64 bit int  (584,942 years)
 
-/**
- * Set to true to 
- * enable logging
- */
-#define ENABLE_LOGGING          false
 
 /**
  * GPIO Power Enable Pin
@@ -118,9 +113,10 @@
 class SENSOR
 {
     public:
-        bool sensor_is_calibrated               = false;
+        bool sensor_ok_to_start               = false;
         bool measure_distance_flag              = false;
         float current_distance                  = 0.0;
+        float previous_distance                 = 0.0;
         float threshold_distance                = 99.99;
         
         /**

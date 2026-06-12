@@ -154,10 +154,11 @@ void setup()
   
   pinMode(BUTTON_INPUT,INPUT);
   
-  pinMode(HBR_IN1,OUTPUT);
+
+  pinMode(HBR_IN1, OUTPUT_OPEN_DRAIN);
   digitalWrite(HBR_IN1, LOW);
   
-  pinMode(HBR_IN2,OUTPUT);
+  pinMode(HBR_IN2, OUTPUT_OPEN_DRAIN);
   digitalWrite(HBR_IN2, LOW);
 
 

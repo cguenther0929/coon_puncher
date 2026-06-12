@@ -35,7 +35,7 @@
 
 // ==============================
 // ==============================
-#define     SW_VER_STRING       "1.1.0" 
+#define     SW_VER_STRING       "1.2.0" 
 // ==============================
 // ==============================
 
@@ -44,7 +44,7 @@
  * Set to true to 
  * enable logging
  */
-#define ENABLE_LOGGING          false
+#define ENABLE_LOGGING          true
 
 /**
  * Health LED
@@ -63,6 +63,8 @@
  */
 #define HBR_IN1                   18
 #define HBR_IN2                   19
+
+#define THRESHOLD_MULTIPLIER      0.95      //-10% would be 0.90
 
 /**
  * Sensor related
@@ -88,12 +90,12 @@
 #define LONG_PRESS_50MS_TICKS    60      
 
 typedef enum State {
-  STATE_WAIT_FOR_CAL,
+  STATE_WAIT_FOR_BUTTON,
   STATE_SLEEP,
   STATE_UNKNOWN,
   STATE_READ_DISTANCE,
   STATE_EVALUATE_DISTANCE,
-  STATE_CALIBRATE,
+  STATE_OK_TO_START,
   STATE_RESET_TRAP
 };
 
