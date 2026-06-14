@@ -34,90 +34,17 @@
 #include <esp_timer.h>
 #include "app.h"
 
-// ==============================
-// ==============================
-#define     SW_VER_STRING       "0.0.1" 
-// ==============================
-// ==============================
-
-/**
- * Sleep Time
- * According to at least one f
- * online source, the maximum sleep time is 
- * 35 minutes.  
- */
-# define SLEEP_TIME_MIN               30                          //The value that the user shall modify (max is 35 min?). 
-# define SLEEPS_UNTIL_DISP_UPDATE     2                           // update the display after this many sleeps 
-# define SLEEPS_UNTIL_EMAIL           24                          // Send an email after this many sleeps 
-# define SLEEP_TIME_SEC               SLEEP_TIME_MIN * 60.0 
-# define SLEEP_TIME_MICROS            SLEEP_TIME_SEC * 1000000.0  // ESP32 sleep function allows for a 64 bit int  (584,942 years)
-
-
-/**
- * GPIO Power Enable Pin
- */
-#define nGPIO_EN_PWR            0
-
-/**
- * Serial parameters
- */
-#define SERIAL_BAUD_RATE        115200
-
-/**
- * Capacity of battery
- */
-#define DEFAULT_BAT_CAP         1700  // 2×850 mAh
-
-
-
-/**
- * Interrupt / button pin
- * 
- */
-#define INTERRUPT_PIN               BUTTON_INPUT    //RTC pins are GPIO0-GPIO3; the button ties to IO1, so the mask shall be 1
-
-/**
- * General parameters related 
- * to the hygrometer application
- */
-
-/**
- * Sensor related
- */
-#define SENSOR_1                    1
-#define SENSOR_2                    2
-
-/* Define IO */
-#define nSENSOR_PWR_EN              3
-#define SENSOR_MUX_RST_LINE         9
-
-/**
- * ESP 32 Analog related parameters
- * It seems that that informaiton available online 
- * is incorrect.  
- * Some of the following values had to be 
- * empirically derived. 
- * We know the attenuation is 11db, which works 
- * out to a voltage gain of 3.548.  Knowing 
- * this, we demanded the digital code be printed 
- * out from the ADC during the "battery read"
- * routein.  Knowing the voltage feeding the pin, 
- * the internal attenuation value, and the fact that
- * we are dealing with 4096 steps (12 bit), we are 
- * able to discern the analog reference voltage. 
- */
-// #define ANALOG_BATT_PIN             A0      // The analog pin on the ESP32-C that is 'watching' the battery voltage
-// #define HYG_ADC_REFERENCE           0.50    // ESP32-C3 ADC reference (calculated)
-
 
 class SENSOR
 {
     public:
-        bool sensor_ok_to_start               = false;
+        bool sensor_ok_to_start                 = false;
         bool measure_distance_flag              = false;
+        bool update_threshold                   = true;
         float current_distance                  = 0.0;
         float previous_distance                 = 0.0;
         float threshold_distance                = 99.99;
+        uint8_t trip_count                      = 0;
         
         /**
          * @brief Sensor initialization routine
@@ -131,7 +58,7 @@ class SENSOR
          * @param \p none 
          * @return nothing 
          */
-        void get_distance( void );
+        bool get_distance( void );
 
         
 };

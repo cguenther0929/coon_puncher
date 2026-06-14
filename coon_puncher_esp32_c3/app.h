@@ -30,12 +30,12 @@
 #ifndef APPFUNCTIONS_H
 #define APPFUNCTIONS_H
 
-#include <Arduino.h>    //This likely defines wire.h
+#include <Arduino.h>
 #include "sensor.h"
 
 // ==============================
 // ==============================
-#define     SW_VER_STRING       "1.2.0" 
+#define     SW_VER_STRING       "1.3.0" 
 // ==============================
 // ==============================
 
@@ -44,7 +44,7 @@
  * Set to true to 
  * enable logging
  */
-#define ENABLE_LOGGING          true
+#define ENABLE_LOGGING          false
 
 /**
  * Health LED
@@ -64,7 +64,9 @@
 #define HBR_IN1                   18
 #define HBR_IN2                   19
 
-#define THRESHOLD_MULTIPLIER      0.95      //-10% would be 0.90
+#define THRESHOLD_MULTIPLIER      0.90      //-10% would be 0.90
+#define AVERAGE_COUNT             6
+#define TRIP_COUNT                5
 
 /**
  * Sensor related
@@ -83,19 +85,13 @@
 #define SOLENOID_TRAVEL_50MS_TICKS_REQUIRED         20
 
 
-/**
- * Button related
- */
-#define SHORT_PRESS_50MS_TICKS   20      // 20 of these in a second
-#define LONG_PRESS_50MS_TICKS    60      
-
 typedef enum State {
   STATE_WAIT_FOR_BUTTON,
   STATE_SLEEP,
   STATE_UNKNOWN,
   STATE_READ_DISTANCE,
   STATE_EVALUATE_DISTANCE,
-  STATE_OK_TO_START,
+  STATE_CALIBRATE,
   STATE_RESET_TRAP
 };
 

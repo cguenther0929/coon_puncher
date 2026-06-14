@@ -17,7 +17,7 @@ void APP::init(void)
  *   STATE_SLEEP,
  *   STATE_READ_DISTANCE,
  *   STATE_EVALUATE_DISTANCE,
- *   STATE_OK_TO_START,
+ *   STATE_CALIBRATE,
  *   STATE_RESET_TRAP
  */
 void APP::state_handler( APP & app_functions, SENSOR & app_sensor_functions ) 
@@ -45,7 +45,11 @@ void APP::state_handler( APP & app_functions, SENSOR & app_sensor_functions )
         Serial.println("^In state **SLEEP**");
       }
 
-      if(app_sensor_functions.measure_distance_flag &&
+      if(app_sensor_functions.update_threshold)
+      {
+           this -> state = STATE_CALIBRATE;
+      }
+      else if(app_sensor_functions.measure_distance_flag &&
          !app_functions.trap_has_triggered)
       {
         app_sensor_functions.measure_distance_flag = false;
@@ -58,9 +62,17 @@ void APP::state_handler( APP & app_functions, SENSOR & app_sensor_functions )
       {
         Serial.println("^In state **READ DISTANCE**");
       }
-      app_sensor_functions.get_distance();
-      this -> state = STATE_EVALUATE_DISTANCE;
-      break;
+      if(app_sensor_functions.get_distance())
+      {
+        Serial.print("Distance reading: ");
+        Serial.println(app_sensor_functions.current_distance);
+        this -> state = STATE_EVALUATE_DISTANCE;
+      }
+      else {
+        Serial.println("\t\t>>>>ERROR Distance reading");
+
+      }
+    break;
       
     case STATE_EVALUATE_DISTANCE:
       
@@ -69,23 +81,44 @@ void APP::state_handler( APP & app_functions, SENSOR & app_sensor_functions )
         Serial.println("^In state **EVALUATE DISTANCE**");
       }
       
-      app_sensor_functions.threshold_distance = app_sensor_functions.previous_distance * THRESHOLD_MULTIPLIER;
+      if(ENABLE_LOGGING)
+        {
+          Serial.print("Threshold: ");
+          Serial.println(app_sensor_functions.threshold_distance);
+        }
       
       if(app_sensor_functions.current_distance < app_sensor_functions.threshold_distance)
+      {
+        app_sensor_functions.trip_count++;
+        if(ENABLE_LOGGING)
         {
-          if(ENABLE_LOGGING)
-          {
-            Serial.println("^Trap is actuating!");
-          }
-          app_functions.solenoid_retract();
-          app_functions.ms50_timer_enabled = true;
+          Serial.println("++Trip count increasing");
         }
+      }
+      else 
+      {
+        if(app_sensor_functions.trip_count > 1)
+        {
+          app_sensor_functions.trip_count--;
+        }
+      }
+      
+      if(app_sensor_functions.trip_count > TRIP_COUNT)
+      {
+        if(ENABLE_LOGGING)
+        {
+          Serial.println("Trap actuating!");
+        }
+        app_functions.solenoid_retract();
+        app_functions.ms50_timer_enabled = true;
+      }
         
       if(ms50_timer_ticks > SOLENOID_TRAVEL_50MS_TICKS_REQUIRED)
       {
+        app_functions.solenoid_stop();
+        app_sensor_functions.trip_count = 0;
         app_functions.ms50_timer_enabled = false;
         app_functions.ms50_timer_ticks = 0;
-        app_functions.solenoid_stop();
         app_functions.trap_has_triggered = true;
         app_functions.fast_blink = true;
         app_functions.enable_led = true;
@@ -101,22 +134,30 @@ void APP::state_handler( APP & app_functions, SENSOR & app_sensor_functions )
 
     break;
 
-    case STATE_OK_TO_START:
+    case STATE_CALIBRATE:
       if(ENABLE_LOGGING)
       {
-        Serial.println("^ **In state **START**");
+        Serial.println("^ **In state **CALIBRATE**");
       }      
-      app_sensor_functions.sensor_ok_to_start  = true;
-      app_functions.enable_led = false;
-      digitalWrite(HEALTH_LED, HIGH);       //Turn LED OFF
       
-      if(ENABLE_LOGGING)
+      if(app_sensor_functions.get_distance())
       {
-        Serial.print("^           **********Threshold set to: ");
-        Serial.println(app_sensor_functions.threshold_distance);
-      }      
-      this -> state = STATE_RESET_TRAP;
-
+        app_sensor_functions.threshold_distance = app_sensor_functions.current_distance * THRESHOLD_MULTIPLIER;
+        app_sensor_functions.sensor_ok_to_start  = true;
+        app_sensor_functions.update_threshold=false; 
+        app_functions.enable_led = false;
+        digitalWrite(HEALTH_LED, HIGH);       //Turn LED OFF
+        
+        if(ENABLE_LOGGING)
+        {
+          Serial.print("Threshold set to: ");
+          Serial.println(app_sensor_functions.threshold_distance);
+        }      
+        this -> state = STATE_RESET_TRAP;
+      }
+      else {
+        Serial.println("\t\t>>>>Error reading distance");
+      }
     break;
     
     case STATE_RESET_TRAP:
@@ -158,8 +199,6 @@ void APP::state_handler( APP & app_functions, SENSOR & app_sensor_functions )
 
 void APP::button_handler ( void )
 {
-
-
   /**
    * if the button is pushed, simply
    * update the counter
@@ -222,7 +261,7 @@ void APP::button_handler ( void )
   if(btn_long_press_flag && !btn_short_press_flag) 
   {
     btn_long_press_flag = false;
-    this -> state = STATE_OK_TO_START;
+    this -> state = STATE_CALIBRATE;
     if(ENABLE_LOGGING)
     {
       Serial.println("^Button long press has been handled.");
@@ -230,11 +269,11 @@ void APP::button_handler ( void )
   }
 }
 
-
 void APP::solenoid_extend( void )
 {
   digitalWrite(HBR_IN1, HIGH);
   digitalWrite(HBR_IN2, LOW);
+  
 }
 
 void APP::solenoid_retract( void )

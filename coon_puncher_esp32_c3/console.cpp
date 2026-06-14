@@ -122,7 +122,7 @@ void CONSOLE::user_console ( APP & console_app_functions )
 
     String test_read_string = "";
 
-    clear_screen(); //Don't want to run insid the while  
+    clear_screen(); //Don't want this inside the following while loop.  
     
     while(user_option != 99)
     {
@@ -160,24 +160,19 @@ void CONSOLE::user_console ( APP & console_app_functions )
 
                 Serial.print("The SW version: ");
                 Serial.println(SW_VER_STRING);
-
+                
                 insert_line_emphasis();
-            break;
-
-            /************************************/
-            /* Report the HW version */
-            /************************************/
-            case 2:           
+                break;
+                
+                /************************************/
+                /* Report the HW version */
+                /************************************/
+                case 2:           
                 clear_screen();
                 insert_line_feeds(2);
                 insert_line_emphasis();
-
-                // console_app_functions.gpio_expander_on();
-                // delay(10);
-                // Serial.print("HW revision: ");
-                // Serial.println(i2c_function.get_hw_revision()); 
-                // console_app_functions.gpio_expander_off();
-
+                
+                Serial.println("HW version: 01");
 
                 insert_line_emphasis();
             break;
@@ -194,12 +189,18 @@ void CONSOLE::user_console ( APP & console_app_functions )
                 Serial.println("Taking 30 distance measurements...");
                 for(temp_uint8t = 0; temp_uint8t < 30; temp_uint8t++)
                 {
-                    console_sensor_functions.get_distance();
-                    Serial.print("Distance Reading (");
-                    Serial.print(temp_uint8t);
-                    Serial.print("): ");
-                    Serial.println(console_sensor_functions.current_distance);
-                    delay(1000);
+                    if(console_sensor_functions.get_distance())
+                    {
+                        Serial.print("Distance Reading (");
+                        Serial.print(temp_uint8t);
+                        Serial.print("): ");
+                        Serial.println(console_sensor_functions.current_distance);
+                        delay(1000);
+                    }
+                    else 
+                    {
+                        Serial.println("Error reading distance");
+                    }
                 }
 
 
@@ -298,10 +299,6 @@ void CONSOLE::user_console ( APP & console_app_functions )
             break;
 
     }
-
-
     }
-
-
 
 }

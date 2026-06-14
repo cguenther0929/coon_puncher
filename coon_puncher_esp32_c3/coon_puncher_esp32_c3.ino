@@ -21,9 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * TODO Add filter to get distance ?
- * TODO determine if we're powering up for the first time, and if so, wait for calibration 
- * TODO do we need a routine for resetting the trap
  */
 
 #include <Arduino.h>
@@ -79,7 +76,6 @@ SENSOR  ino_sensor_functions;
  * @brief Timer interrupt
  * @details This function has to 'live' 
  * up above the setup routine
- * 
  */
 void IRAM_ATTR onTimer()
 {
@@ -275,7 +271,6 @@ void loop()
       {
         digitalWrite(HEALTH_LED, !digitalRead(HEALTH_LED));
       }
-
       
     }
     /**
@@ -289,8 +284,6 @@ void loop()
       {
         digitalWrite(HEALTH_LED, !digitalRead(HEALTH_LED));
       }
-
-      
       
       ino_app_functions.seconds_counter++;
       
@@ -302,10 +295,10 @@ void loop()
       }
 
       /* The following is nice for longer delays */
-      if(ino_app_functions.seconds_counter >= 30)  
+      if(ino_app_functions.seconds_counter >= 3600)  // An hour's worth of seconds  
       {
+        ino_sensor_functions.update_threshold = true;
         ino_app_functions.seconds_counter = 0;
-
       }
     } /* IF Timer1000msFlag */
   } /* WHILE (TRUE) */
